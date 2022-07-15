@@ -1,19 +1,20 @@
-FROM ubuntu:focal
-
-LABEL maintainer="Victor Seva <linuxmaniac@torreviejawireless.org>"
-
-# Important! Update this no-op ENV variable when this Dockerfile
-# is updated with the current date. It will force refresh of all
-# of the base images and things like 'apt-get update' won't be using
-# old cached versions when the Dockerfile is built.
-ENV REFRESHED_AT 2022-07-12
+FROM ubuntu:focal AS base
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN rm -rf /var/lib/apt/lists/* && apt-get update &&   apt-get install --assume-yes gnupg wget
-# kamailio repo
+RUN rm -rf /var/lib/apt/lists/* && apt-get update &&  apt-get upgrade --assume-yes
+RUN apt-get install --assume-yes gnupg wget
 RUN echo "deb http://deb.kamailio.org/kamailio56 focal main" >   /etc/apt/sources.list.d/kamailio.list
 RUN wget -O- http://deb.kamailio.org/kamailiodebkey.gpg | apt-key add -
+
+
+FROM base
+
+LABEL maintainer="Matteo Brancaleoni <matteo.brancaleoni@voismart.it>"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+VOLUME /etc/kamailio
 
 RUN apt-get update && apt-get install --assume-yes \
   kamailio=5.6.1+ubuntu20.04 \
@@ -60,8 +61,6 @@ RUN apt-get update && apt-get install --assume-yes \
   kamailio-websocket-modules=5.6.1+ubuntu20.04 \
   kamailio-xml-modules=5.6.1+ubuntu20.04 \
   kamailio-xmpp-modules=5.6.1+ubuntu20.04
-
-VOLUME /etc/kamailio
 
 # clean
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
