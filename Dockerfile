@@ -3,7 +3,7 @@ FROM ubuntu:focal AS base
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN rm -rf /var/lib/apt/lists/* && apt-get update &&  apt-get upgrade --assume-yes
-RUN apt-get install --assume-yes gnupg wget
+RUN apt-get install --assume-yes gnupg wget gettext-base
 RUN echo "deb http://deb.kamailio.org/kamailio56 focal main" >   /etc/apt/sources.list.d/kamailio.list
 RUN wget -O- http://deb.kamailio.org/kamailiodebkey.gpg | apt-key add -
 
@@ -65,4 +65,7 @@ RUN apt-get update && apt-get install --assume-yes \
 # clean
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT exec kamailio -DD -E
+COPY ./docker-entrypoint.sh /
+
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+CMD ["kamailio", "-DD", "-E", "-f", "/tmp/kamailio/kamailio.cfg"]
