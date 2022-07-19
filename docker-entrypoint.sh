@@ -10,4 +10,4 @@ if [ -f "/tmp/kamailio/kamailio-env.cfg" ]; then
 fi
 
 # now start the kamailio
-exec "$@"
+exec "$@" -m $SHM_MEMORY -M $PKG_MEMORY

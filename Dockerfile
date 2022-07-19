@@ -67,5 +67,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY ./docker-entrypoint.sh /
 
+ENV SHM_MEMORY=64
+ENV PKG_MEMORY=8
+
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 CMD ["kamailio", "-DD", "-E", "-f", "/tmp/kamailio/kamailio.cfg"]
